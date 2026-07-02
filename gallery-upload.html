@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>কমিউনিটি ফটো গ্যালারি</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f2b26;
+    --panel:#163c34;
+    --panel-2:#1c4a40;
+    --line:rgba(224,192,90,0.18);
+    --gold:#c9a227;
+    --gold-light:#e0c05a;
+    --ink:#f4efe0;
+    --muted:#9fb8ae;
+    --danger:#c0574a;
+    --ok:#7fae7a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 500px at 15% -10%, rgba(224,192,90,0.08), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding:56px 20px 80px;
+  }
+  .wrap{max-width:1080px; margin:0 auto;}
+
+  /* ===== header ===== */
+  .badge{
+    width:44px;height:44px;
+    border:1.5px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--gold-light);
+    margin-bottom:18px;
+    position:relative;
+  }
+  .badge::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border:1px dashed rgba(201,162,39,0.35);
+    border-radius:50%;
+  }
+
+  .head-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(26px, 4vw, 38px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--gold-light);
+    font-weight:500;
+  }
+  .count-pill{
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:7px 14px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .count-pill strong{color:var(--gold-light); font-weight:600;}
+
+  .sub{
+    color:var(--muted);
+    font-size:14.5px;
+    font-weight:300;
+    margin:8px 0 40px 0;
+    max-width:600px;
+    line-height:1.6;
+  }
+
+  /* ===== masonry gallery ===== */
+  .gallery-grid{
+    column-count:3;
+    column-gap:14px;
+  }
+  @media (max-width:860px){ .gallery-grid{column-count:2;} }
+  @media (max-width:520px){ .gallery-grid{column-count:1;} }
+
+  .photo-card{
+    break-inside:avoid;
+    margin-bottom:14px;
+    position:relative;
+    border-radius:6px;
+    overflow:hidden;
+    background:var(--panel);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .photo-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 34px -18px rgba(0,0,0,0.55);
+  }
+  .photo-card img{
+    width:100%;
+    display:block;
+    height:auto;
+  }
+  .photo-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top, rgba(10,20,17,0.88) 0%, rgba(10,20,17,0.15) 45%, transparent 70%);
+    opacity:0;
+    transition:opacity 0.25s ease;
+    display:flex;
+    align-items:flex-end;
+    padding:14px;
+  }
+  .photo-card:hover .photo-overlay{opacity:1;}
+  .overlay-meta{font-size:12px; line-height:1.5;}
+  .overlay-name{font-weight:600; color:var(--gold-light); font-size:13px;}
+  .overlay-sub{color:var(--muted);}
+
+  .empty-state{
+    grid-column:1/-1;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:60px 24px;
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.7;
+  }
+  .empty-state strong{display:block; color:var(--ink); font-family:'Fraunces', serif; font-size:19px; font-weight:500; margin-bottom:8px;}
+
+  /* ===== lightbox ===== */
+  .lightbox{
+    position:fixed; inset:0;
+    background:rgba(6,14,12,0.92);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:40px 20px;
+  }
+  .lightbox.open{display:flex;}
+  .lightbox-inner{
+    max-width:900px;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .lightbox img{
+    max-width:100%;
+    max-height:70vh;
+    border-radius:4px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox-caption{
+    margin-top:16px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .lightbox-caption strong{color:var(--gold-light); font-family:'Fraunces', serif; font-size:16px; font-weight:500;}
+  .lb-btn{
+    position:absolute;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--line);
+    color:var(--ink);
+    width:42px;height:42px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .lb-btn:hover{border-color:var(--gold);}
+  .lb-close{top:24px; right:24px;}
+  .lb-prev{left:24px; top:50%; transform:translateY(-50%);}
+  .lb-next{right:24px; top:50%; transform:translateY(-50%);}
+  @media (max-width:600px){ .lb-prev{left:8px;} .lb-next{right:8px;} .lb-close{top:12px; right:12px;} }
+
+  /* ===== upload section ===== */
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:64px 0 28px 0;
+  }
+  .divider .line{flex:1; height:1px; background:var(--line);}
+  .divider span{
+    font-size:11.5px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .upload-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:32px;
+  }
+  .upload-title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:21px;
+    margin:0 0 4px 0;
+  }
+  .upload-hint{
+    color:var(--muted);
+    font-size:13px;
+    margin:0 0 24px 0;
+    font-weight:300;
+  }
+
+  .field-label{
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:block;
+    margin-bottom:8px;
+  }
+  #memberIdInput{
+    width:100%;
+    max-width:280px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:11px 14px;
+    border-radius:4px;
+    outline:none;
+    transition:border-color 0.2s ease;
+  }
+  #memberIdInput:focus{border-color:var(--gold);}
+  #memberIdInput::placeholder{color:rgba(159,184,174,0.5);}
+
+  .dropzone{
+    margin-top:22px;
+    border:1.5px dashed var(--line);
+    border-radius:6px;
+    padding:38px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color 0.25s ease, background 0.25s ease;
+    position:relative;
+  }
+  .dropzone.drag-over{
+    border-color:var(--gold);
+    background:rgba(201,162,39,0.06);
+  }
+  .dz-icon{
+    width:38px;height:38px;
+    margin:0 auto 14px auto;
+    border:1.5px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold-light);
+  }
+  .dz-text{font-size:14px; color:var(--ink); margin:0 0 4px 0;}
+  .dz-text b{color:var(--gold-light); font-weight:600;}
+  .dz-sub{font-size:12px; color:var(--muted); margin:0;}
+  #fileInput{display:none;}
+
+  .preview-strip{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .preview-item{
+    position:relative;
+    width:76px;height:76px;
+    border-radius:5px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .preview-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .preview-remove{
+    position:absolute;
+    top:3px;right:3px;
+    width:19px;height:19px;
+    border-radius:50%;
+    background:rgba(10,20,17,0.85);
+    color:var(--ink);
+    border:none;
+    font-size:12px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .preview-remove:hover{background:var(--danger);}
+
+  .upload-actions{
+    margin-top:24px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .upload-btn{
+    background:var(--gold);
+    color:#1a1508;
+    border:none;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    letter-spacing:0.03em;
+    padding:12px 26px;
+    border-radius:24px;
+    cursor:pointer;
+    transition:background 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+  }
+  .upload-btn:hover:not(:disabled){background:var(--gold-light); transform:translateY(-1px);}
+  .upload-btn:disabled{opacity:0.4; cursor:not-allowed;}
+
+  .status-msg{
+    font-size:13px;
+    display:none;
+    align-items:center;
+    gap:8px;
+  }
+  .status-msg.show{display:flex;}
+  .status-msg.ok{color:var(--ok);}
+  .status-msg.err{color:var(--danger);}
+
+  .spinner{
+    width:14px;height:14px;
+    border:2px solid rgba(244,239,224,0.25);
+    border-top-color:var(--ink);
+    border-radius:50%;
+    animation:spin 0.7s linear infinite;
+    display:none;
+  }
+  .spinner.show{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .config-warning{
+    margin-top:18px;
+    font-size:12px;
+    color:var(--danger);
+    border:1px dashed rgba(192,87,74,0.4);
+    padding:10px 14px;
+    border-radius:5px;
+    display:none;
+  }
+  .config-warning.show{display:block;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="badge">SG</div>
+
+  <div class="head-row">
+    <h1>মেম্বারদের <em>মুহূর্তগুলো</em></h1>
+    <div class="count-pill"><strong id="photoCount">০</strong> টি ছবি</div>
+  </div>
+  <p class="sub">সমিতির অনুষ্ঠান, সভা আর একসাথে কাটানো সময়ের ছবি এখানে জমা হচ্ছে। নিচ থেকে নিজের ছবি যুক্ত করতে পারবেন।</p>
+
+  <div class="gallery-grid" id="galleryGrid">
+    <div class="empty-state" id="emptyState">
+      <strong>এখনো কোনো ছবি নেই</strong>
+      ছবি লোড হচ্ছে... সংযোগ ঠিক থাকলে এখানে সবার আপলোড করা ছবি দেখা যাবে।
+    </div>
+  </div>
+
+  <div class="divider"><span>ছবি যুক্ত করুন</span><div class="line"></div></div>
+
+  <div class="upload-card">
+    <p class="upload-title">আপনার ছবি আপলোড করুন</p>
+    <p class="upload-hint">নিজের মেম্বার আইডি দিন, তারপর ছবি টেনে এনে ছাড়ুন (drag &amp; drop) অথবা ক্লিক করে বেছে নিন — একসাথে একাধিক ছবি দেওয়া যাবে।</p>
+
+    <label class="field-label" for="memberIdInput">মেম্বার আইডি</label>
+    <input type="text" id="memberIdInput" placeholder="যেমন: EGE0101">
+
+    <div class="dropzone" id="dropzone">
+      <div class="dz-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+      </div>
+      <p class="dz-text"><b>এখানে ছবি টেনে আনুন</b> অথবা ক্লিক করে বেছে নিন</p>
+      <p class="dz-sub">JPG, PNG — সর্বোচ্চ ৮ এমবি প্রতি ছবি</p>
+      <input type="file" id="fileInput" accept="image/*" multiple>
+    </div>
+
+    <div class="preview-strip" id="previewStrip"></div>
+
+    <div class="upload-actions">
+      <button class="upload-btn" id="uploadBtn" disabled>ছবি আপলোড করুন</button>
+      <div class="status-msg" id="statusMsg">
+        <span class="spinner" id="spinner"></span>
+        <span id="statusText"></span>
+      </div>
+    </div>
+
+    <div class="config-warning" id="configWarning">
+      সার্ভার এখনো সংযুক্ত করা হয়নি — নিচের কোডে <code>APPS_SCRIPT_URL</code> এর জায়গায় আপনার Google Apps Script Web App-এর ডিপ্লয় করা URL বসান।
+    </div>
+  </div>
+
+</div>
+
+<!-- lightbox -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption">
+      <strong id="lbName"></strong>
+      <div id="lbMeta"></div>
+    </div>
+  </div>
+  <button class="lb-btn lb-close" id="lbClose" aria-label="বন্ধ করুন">✕</button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="আগের ছবি">‹</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="পরের ছবি">›</button>
+</div>
+
+<script>
+/* =========================================================
+   এখানে আপনার Apps Script Web App-এর ডিপ্লয়কৃত URL বসান
+   (Apps Script এডিটরে "Deploy > New deployment > Web app" করার পর
+   যে URL পাবেন, সেটা এখানে বসাতে হবে — .../exec দিয়ে শেষ হবে)
+   ========================================================= */
+const APPS_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE";
+
+const MAX_FILES = 10;
+const MAX_FILE_BYTES = 8 * 1024 * 1024;
+
+let galleryPhotos = [];
+let selectedFiles = [];
+let lightboxIndex = 0;
+
+const galleryGrid   = document.getElementById('galleryGrid');
+const emptyState    = document.getElementById('emptyState');
+const photoCountEl  = document.getElementById('photoCount');
+const dropzone      = document.getElementById('dropzone');
+const fileInput     = document.getElementById('fileInput');
+const previewStrip  = document.getElementById('previewStrip');
+const uploadBtn     = document.getElementById('uploadBtn');
+const memberIdInput = document.getElementById('memberIdInput');
+const statusMsg     = document.getElementById('statusMsg');
+const statusText    = document.getElementById('statusText');
+const spinner       = document.getElementById('spinner');
+const configWarning = document.getElementById('configWarning');
+
+const lightbox    = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+const lbName      = document.getElementById('lbName');
+const lbMeta      = document.getElementById('lbMeta');
+
+function isConfigured(){
+  return APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYED_WEB_APP_URL_HERE') === -1;
+}
+
+/* ---------- গ্যালারি লোড ---------- */
+async function loadGallery(){
+  if(!isConfigured()){
+    configWarning.classList.add('show');
+    emptyState.querySelector('strong').textContent = 'সার্ভার সংযুক্ত করা হয়নি';
+    emptyState.lastChild.textContent = 'উপরে ব্যাখ্যা করা জায়গায় Apps Script URL বসিয়ে পেজটি রিফ্রেশ করুন।';
+    return;
+  }
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=getGallery');
+    const json = await res.json();
+    if(json.success){
+      galleryPhotos = json.photos || [];
+      renderGallery();
+    } else {
+      showEmpty('ছবি লোড করা যায়নি', json.error || 'অজানা সমস্যা হয়েছে।');
+    }
+  } catch(err){
+    showEmpty('সংযোগ ব্যর্থ হয়েছে', 'সার্ভারের সাথে সংযোগ করা যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।');
+  }
+}
+
+function showEmpty(title, sub){
+  emptyState.style.display = 'block';
+  emptyState.querySelector('strong').textContent = title;
+  emptyState.lastChild.textContent = sub;
+}
+
+function renderGallery(){
+  photoCountEl.textContent = galleryPhotos.length.toLocaleString('bn-BD');
+  galleryGrid.querySelectorAll('.photo-card').forEach(el => el.remove());
+
+  if(galleryPhotos.length === 0){
+    showEmpty('এখনো কোনো ছবি নেই', 'প্রথম ছবিটি আপলোড করে গ্যালারি শুরু করুন।');
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  galleryPhotos.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    card.innerHTML = `
+      <img src="${p.imageUrl}" alt="${escapeHtml(p.memberName || p.memberId)}" loading="lazy">
+      <div class="photo-overlay">
+        <div class="overlay-meta">
+          <div class="overlay-name">${escapeHtml(p.memberName || p.memberId)}</div>
+          <div class="overlay-sub">${escapeHtml(p.memberId)} · ${escapeHtml(p.date)}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => openLightbox(i));
+    galleryGrid.appendChild(card);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+/* ---------- লাইটবক্স ---------- */
+function openLightbox(i){
+  lightboxIndex = i;
+  updateLightbox();
+  lightbox.classList.add('open');
+}
+function updateLightbox(){
+  const p = galleryPhotos[lightboxIndex];
+  if(!p) return;
+  lightboxImg.src = p.imageUrl;
+  lbName.textContent = p.memberName || p.memberId;
+  lbMeta.textContent = p.memberId + ' · ' + p.date;
+}
+document.getElementById('lbClose').addEventListener('click', () => lightbox.classList.remove('open'));
+document.getElementById('lbPrev').addEventListener('click', () => { lightboxIndex = (lightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length; updateLightbox(); });
+document.getElementById('lbNext').addEventListener('click', () => { lightboxIndex = (lightboxIndex + 1) % galleryPhotos.length; updateLightbox(); });
+lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('open'); });
+document.addEventListener('keydown', (e) => {
+  if(!lightbox.classList.contains('open')) return;
+  if(e.key === 'Escape') lightbox.classList.remove('open');
+  if(e.key === 'ArrowLeft') document.getElementById('lbPrev').click();
+  if(e.key === 'ArrowRight') document.getElementById('lbNext').click();
+});
+
+/* ---------- ড্র্যাগ-এন্ড-ড্রপ আপলোড ---------- */
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+function handleFiles(fileList){
+  const incoming = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  for(const f of incoming){
+    if(selectedFiles.length >= MAX_FILES){
+      setStatus('err', 'সর্বোচ্চ ' + MAX_FILES + 'টি ছবি একসাথে আপলোড করা যাবে।');
+      break;
+    }
+    if(f.size > MAX_FILE_BYTES){
+      setStatus('err', f.name + ' — ফাইলের আকার ৮ এমবি-র বেশি, এটি বাদ দেওয়া হয়েছে।');
+      continue;
+    }
+    selectedFiles.push(f);
+  }
+  renderPreviews();
+  updateUploadBtn();
+  fileInput.value = '';
+}
+
+function renderPreviews(){
+  previewStrip.innerHTML = '';
+  selectedFiles.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'preview-item';
+    const img = document.createElement('img');
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    reader.readAsDataURL(f);
+    item.appendChild(img);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'preview-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedFiles.splice(i, 1);
+      renderPreviews();
+      updateUploadBtn();
+    });
+    item.appendChild(removeBtn);
+    previewStrip.appendChild(item);
+  });
+}
+
+function updateUploadBtn(){
+  uploadBtn.disabled = !(memberIdInput.value.trim() && selectedFiles.length > 0);
+}
+memberIdInput.addEventListener('input', updateUploadBtn);
+
+function setStatus(kind, text){
+  statusMsg.className = 'status-msg show ' + kind;
+  statusText.textContent = text;
+}
+function clearStatus(){
+  statusMsg.className = 'status-msg';
+  statusText.textContent = '';
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+uploadBtn.addEventListener('click', async () => {
+  if(!isConfigured()){
+    setStatus('err', 'আগে Apps Script URL কনফিগার করুন।');
+    return;
+  }
+  const memberId = memberIdInput.value.trim();
+  if(!memberId || selectedFiles.length === 0) return;
+
+  uploadBtn.disabled = true;
+  spinner.classList.add('show');
+  setStatus('', 'ছবি আপলোড হচ্ছে...');
+  statusMsg.className = 'status-msg show';
+
+  try {
+    const filesPayload = await Promise.all(selectedFiles.map(async (f) => ({
+      name: f.name,
+      type: f.type,
+      data: await fileToBase64(f)
+    })));
+
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'uploadGalleryPhotos',
+        memberId: memberId,
+        files: filesPayload
+      })
+    });
+    const json = await res.json();
+
+    if(json.success){
+      setStatus('ok', selectedFiles.length + 'টি ছবি সফলভাবে আপলোড হয়েছে।');
+      selectedFiles = [];
+      renderPreviews();
+      await loadGallery();
+    } else {
+      setStatus('err', json.error || 'আপলোড ব্যর্থ হয়েছে।');
+    }
+  } catch(err){
+    setStatus('err', 'সার্ভারের সাথে সংযোগ করা যায়নি।');
+  } finally {
+    spinner.classList.remove('show');
+    updateUploadBtn();
+  }
+});
+
+loadGallery();
+</script>
+
+</body>
+</html>
