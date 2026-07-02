@@ -36,8 +36,15 @@
   .brand-row{
     display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:12px;
     margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  .brand-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
   .brand-logo{
     width:40px;height:40px;
@@ -51,6 +58,25 @@
     letter-spacing:0.03em;
     color:var(--gold-light);
   }
+  .back-home{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    text-decoration:none;
+    color:var(--muted);
+    font-size:12.5px;
+    letter-spacing:0.03em;
+    border:1px solid var(--line);
+    padding:8px 15px;
+    border-radius:20px;
+    transition:border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .back-home:hover{
+    border-color:var(--gold);
+    color:var(--ink);
+    background:rgba(201,162,39,0.06);
+  }
+  .back-home svg{width:13px;height:13px;}
 
   .head-row{
     display:flex;
@@ -381,8 +407,14 @@
 <div class="wrap">
 
   <div class="brand-row">
-    <img src="https://egreenent.github.io/evergreen/logo.png" alt="EverGreen Enterprise" class="brand-logo">
-    <span class="brand-name">EverGreen Enterprise</span>
+    <div class="brand-left">
+      <img src="https://egreenent.github.io/evergreen/logo.png" alt="EverGreen Enterprise" class="brand-logo">
+      <span class="brand-name">EverGreen Enterprise</span>
+    </div>
+    <a href="https://egreenent.github.io/evergreen/" class="back-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back to Home
+    </a>
   </div>
 
   <div class="head-row">
