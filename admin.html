@@ -672,6 +672,7 @@ border-radius:8px;
 <a href="#" onclick="showSection('oldRecordsSection', this); loadOldRecords();">📂 Old Records</a>
 <a href="#" onclick="showSection('expensesSection', this); loadExpensesSection();">💸 Expenses</a>
 <a href="#" onclick="showSection('noticesSection', this)">📢 Notices</a>
+<a href="#" onclick="showSection('gallerySection', this); loadGalleryAdmin();">🖼️ Gallery</a>
 <a href="#" onclick="showSection('downloadsSection', this)">📥 Downloads</a>
 <a href="#" onclick="showSection('analyticsSection', this); loadAnalytics();">📊 Analytics</a>
 <a href="#" onclick="showSection('settingsSection', this)">⚙ Settings</a>
@@ -723,6 +724,11 @@ border-radius:8px;
 <h2 id="activeMembers">0</h2>
 </div>
 
+<div class="card" style="border-left:4px solid #f5a623">
+<h3>⏳ Pending Approval</h3>
+<h2 id="pendingCardCount" style="color:#f5a623">0</h2>
+</div>
+
 
 </div>
 
@@ -743,6 +749,29 @@ border-radius:8px;
 
 </div>
 
+</div>
+
+<div class="section" id="pendingApprovalsSection">
+<h2>⏳ Pending Approvals
+  <span id="pendingBadge" style="background:#f5a623;color:#fff;padding:2px 10px;border-radius:12px;font-size:14px;margin-left:8px;display:none">0</span>
+</h2>
+<div class="table-container">
+<table class="table">
+<thead>
+<tr>
+<th>Member ID</th>
+<th>Name</th>
+<th>Phone</th>
+<th>Email</th>
+<th>Join Date</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="pendingMembersTable">
+<tr><td colspan="6" style="text-align:center;color:#888;padding:20px">লোড হচ্ছে...</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 
 <div class="section">
@@ -944,11 +973,13 @@ Save Member
                 </select>
             </div>
             <button onclick="loadDueMembers()" style="padding:11px 22px;background:#0b6623;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">🔍 বকেয়া খুঁজুন</button>
+            <button id="sendReminderBtn" onclick="sendDueRemindersNow()" style="padding:11px 22px;background:#1565c0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">📧 এখনই ইমেইল রিমাইন্ডার পাঠান</button>
             <div id="dueSummary" style="margin-left:auto;background:#fff0f0;border:2px solid #ffcdd2;border-radius:10px;padding:10px 20px;display:none;gap:16px;align-items:center">
                 <span style="font-size:13px;color:#666">বকেয়া সদস্য: <strong id="dueCount" style="color:#d62828;font-size:18px">০</strong></span>
                 <span style="font-size:13px;color:#666">মোট বকেয়া: <strong id="dueTotalAmt" style="color:#d62828;font-size:18px">৳ ০</strong></span>
             </div>
         </div>
+        <div id="reminderStatusMsg" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:500"></div>
 
         <div class="table-container">
             <table class="admin-payment-table">
@@ -1037,6 +1068,21 @@ Save Member
       🔄 গুগল শিট থেকে লাইভ নোটিশ লোড হচ্ছে...
     </div>
   </div>
+</div>
+
+<!-- GALLERY -->
+
+<div class="page-section" id="gallerySection">
+<div class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+    <h2 style="margin-bottom:0">🖼️ Photo Gallery Management</h2>
+    <button onclick="loadGalleryAdmin()" style="background:#0b6b2d;color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 Refresh</button>
+  </div>
+  <p style="color:#666;font-size:14px;margin-bottom:20px">মেম্বারদের আপলোড করা সব ছবি এখানে দেখা যাবে। অবাঞ্ছিত ছবি ডিলিট করতে পারবেন।</p>
+  <div id="galleryAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">
+    <p style="color:#888;grid-column:1/-1;text-align:center;padding:20px">লোড হচ্ছে...</p>
+  </div>
+</div>
 </div>
 
   
@@ -1520,8 +1566,178 @@ async function fetchMembers() {
         
         displayMembers(members); // টেবিলে শো করা
         updateDashboard();      // ড্যাশবোর্ড আপডেট করা
+        renderPendingApprovals(); // Pending Approval লিস্ট আপডেট করা
     } catch(error) {
         console.error("Error fetching members:", error);
+    }
+}
+
+/* =========================================
+   PENDING APPROVALS — Dashboard
+   ========================================= */
+function renderPendingApprovals(){
+    const pending = (members || []).filter(m => String(m.status || '').trim().toLowerCase() === 'pending');
+
+    const countEl = document.getElementById('pendingCardCount');
+    if(countEl) countEl.innerText = pending.length;
+
+    const badge = document.getElementById('pendingBadge');
+    if(badge){
+        badge.style.display = pending.length ? 'inline-block' : 'none';
+        badge.innerText = pending.length;
+    }
+
+    const tbody = document.getElementById('pendingMembersTable');
+    if(!tbody) return;
+
+    if(pending.length === 0){
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;padding:20px">কোনো নতুন আবেদন বাকি নেই ✅</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = pending.map(m => `
+        <tr>
+            <td><strong>${m.memberId}</strong></td>
+            <td>${m.name || ''}</td>
+            <td>${m.phone || ''}</td>
+            <td>${m.email || ''}</td>
+            <td>${m.joinDate || ''}</td>
+            <td style="display:flex;gap:6px;flex-wrap:wrap">
+                <button onclick="approveMember('${m.memberId}')" style="background:#0b6b2d;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">✅ Approve</button>
+                <button onclick="rejectMember('${m.memberId}')" style="background:#d62828;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">❌ Reject</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function buildEditPayloadFor(m, newStatus){
+    return {
+        action: 'editMember',
+        memberId:      m.memberId,
+        name:          m.name,
+        phone:         m.phone,
+        email:         m.email        || '',
+        nid:           m.nid          || '',
+        blood:         m.blood        || '',
+        address:       m.address      || '',
+        nomineeName:   m.nomineeName  || '',
+        nomineePhone:  m.nomineePhone || '',
+        joinDate:      m.joinDate     || '',
+        monthlyFee:    m.monthlyFee   || 0,
+        password:      m.password     || '', // আগের হ্যাশ যেমন আছে তেমনই থেকে যাবে
+        photo:         m.photo        || '',
+        signatureUrl:  m.signatureUrl || '',
+        pdfUrl:        m.pdfUrl       || '',
+        idCardUrl:     m.idCardUrl    || '',
+        status:        newStatus
+    };
+}
+
+async function approveMember(memberId){
+    const m = members.find(u => String(u.memberId).trim() === String(memberId).trim());
+    if(!m) return alert('সদস্য তথ্য পাওয়া যায়নি!');
+    if(!confirm(`${m.name} (${memberId})-কে Approve করবেন?`)) return;
+
+    try {
+        await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(buildEditPayloadFor(m, 'Active')) });
+        alert(`✅ ${m.name} অনুমোদিত হয়েছে!`);
+        fetchMembers();
+    } catch(e){
+        alert('❌ অনুমোদন করতে সমস্যা হয়েছে।');
+    }
+}
+
+async function rejectMember(memberId){
+    const m = members.find(u => String(u.memberId).trim() === String(memberId).trim());
+    if(!m) return alert('সদস্য তথ্য পাওয়া যায়নি!');
+    if(!confirm(`${m.name} (${memberId})-এর আবেদন Reject করবেন?`)) return;
+
+    try {
+        await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(buildEditPayloadFor(m, 'Rejected')) });
+        alert(`❌ ${m.name}-এর আবেদন Reject করা হয়েছে।`);
+        fetchMembers();
+    } catch(e){
+        alert('❌ Reject করতে সমস্যা হয়েছে।');
+    }
+}
+
+/* =========================================
+   GALLERY MANAGEMENT — Admin
+   ========================================= */
+async function loadGalleryAdmin(){
+    const grid = document.getElementById('galleryAdminGrid');
+    if(!grid) return;
+    grid.innerHTML = '<p style="color:#888;grid-column:1/-1;text-align:center;padding:20px">লোড হচ্ছে...</p>';
+    try {
+        const res = await fetch(API_URL + '?action=getGallery');
+        const json = await res.json();
+        const photos = json.photos || [];
+        if(photos.length === 0){
+            grid.innerHTML = '<p style="color:#888;grid-column:1/-1;text-align:center;padding:30px">কোনো ছবি নেই।</p>';
+            return;
+        }
+        grid.innerHTML = photos.map(p => `
+            <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+                <img src="${p.imageUrl}" style="width:100%;height:130px;object-fit:cover;display:block;background:#eee">
+                <div style="padding:10px;font-size:12px;color:#555">
+                    <div style="font-weight:700;color:#0b6b2d">${p.memberName || p.memberId}</div>
+                    <div>${p.memberId} · ${p.date}</div>
+                    <button onclick="deleteGalleryPhoto('${p.fileId}')" style="margin-top:8px;width:100%;background:#d62828;color:#fff;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">🗑️ Delete</button>
+                </div>
+            </div>
+        `).join('');
+    } catch(err){
+        grid.innerHTML = '<p style="color:#d62828;grid-column:1/-1;text-align:center;padding:20px">ছবি লোড করা যায়নি।</p>';
+    }
+}
+
+async function deleteGalleryPhoto(fileId){
+    if(!confirm('এই ছবিটি স্থায়ীভাবে ডিলিট করবেন?')) return;
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'deleteGalleryPhoto', fileId: fileId })
+        });
+        const result = await res.json();
+        if(result.success){
+            alert('🗑️ ছবি ডিলিট হয়েছে।');
+            loadGalleryAdmin();
+        } else {
+            alert('ডিলিট ব্যর্থ: ' + (result.error || ''));
+        }
+    } catch(err){
+        alert('সার্ভার সমস্যা, ডিলিট করা যায়নি।');
+    }
+}
+
+/* =========================================
+   EMAIL DUE REMINDER — Manual Trigger
+   ========================================= */
+async function sendDueRemindersNow(){
+    const btn = document.getElementById('sendReminderBtn');
+    const msgBox = document.getElementById('reminderStatusMsg');
+    if(!confirm('এই মুহূর্তে সব বকেয়া সক্রিয় মেম্বারকে ইমেইল রিমাইন্ডার পাঠাতে চান?')) return;
+
+    if(btn){ btn.disabled = true; btn.innerText = '⏳ পাঠানো হচ্ছে...'; }
+    if(msgBox){ msgBox.style.display = 'block'; msgBox.style.background = '#eef2ff'; msgBox.style.color = '#333'; msgBox.innerText = 'ইমেইল পাঠানো হচ্ছে, একটু অপেক্ষা করুন...'; }
+
+    try {
+        const res = await fetch(API_URL + '?action=sendDueReminders');
+        const json = await res.json();
+        if(json.success){
+            const r = json.result;
+            let text = `✅ ${r.sent}টি ইমেইল সফলভাবে পাঠানো হয়েছে (${r.month})।`;
+            if(r.skipped && r.skipped.length){
+                text += ` ${r.skipped.length}টি বাদ পড়েছে (ইমেইল নেই বা পাঠানো যায়নি)।`;
+            }
+            if(msgBox){ msgBox.style.background = '#e8f8ee'; msgBox.style.color = '#0b6623'; msgBox.innerText = text; }
+        } else {
+            if(msgBox){ msgBox.style.background = '#fff0f0'; msgBox.style.color = '#d62828'; msgBox.innerText = '❌ রিমাইন্ডার পাঠাতে সমস্যা হয়েছে।'; }
+        }
+    } catch(err){
+        if(msgBox){ msgBox.style.background = '#fff0f0'; msgBox.style.color = '#d62828'; msgBox.innerText = '❌ সার্ভারের সাথে সংযোগ করা যায়নি।'; }
+    } finally {
+        if(btn){ btn.disabled = false; btn.innerText = '📧 এখনই ইমেইল রিমাইন্ডার পাঠান'; }
     }
 }
 
