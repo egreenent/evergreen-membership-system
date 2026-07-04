@@ -24,6 +24,44 @@ background:#edf3ee;
 padding:30px;
 }
 
+.home-btn{
+position:fixed;
+top:20px;
+left:20px;
+display:inline-flex;
+align-items:center;
+gap:7px;
+background:#fff;
+color:#0b5d2a;
+text-decoration:none;
+font-size:14px;
+font-weight:600;
+padding:10px 18px;
+border-radius:30px;
+border:2px solid #0b5d2a;
+box-shadow:0 4px 14px rgba(0,0,0,0.08);
+z-index:999;
+}
+
+.home-btn:hover{
+background:#0b5d2a;
+color:#fff;
+}
+
+.home-btn svg{
+width:15px;
+height:15px;
+}
+
+@media(max-width:500px){
+.home-btn{
+top:12px;
+left:12px;
+padding:8px 14px;
+font-size:13px;
+}
+}
+
 .form-container{
 max-width:1100px;
 margin:auto;
@@ -377,6 +415,11 @@ letter-spacing:2px;
 
 <body>
 
+<a href="https://egreenent.github.io/evergreen/" class="home-btn">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V10"/></svg>
+Home
+</a>
+
 <div class="form-container">
 
 <div class="top-border"></div>
@@ -644,14 +687,13 @@ I hereby declare that all the above information is true and correct to the best 
 
 <div class="btn-area">
 
-<!--  Batton Close
 <button class="submit-btn" onclick="submitForm()">
 Submit Application
 </button>
 
 <button class="reset-btn">
 Reset Form
-</button>  -->
+</button>
 
 </div>
 
