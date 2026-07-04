@@ -1726,13 +1726,16 @@ async function sendDueRemindersNow(){
         const json = await res.json();
         if(json.success){
             const r = json.result;
-            let text = `✅ ${r.sent}টি ইমেইল সফলভাবে পাঠানো হয়েছে (${r.month})।`;
+            let html = `✅ ${r.sent}টি ইমেইল সফলভাবে পাঠানো হয়েছে (${r.month})।`;
             if(r.skipped && r.skipped.length){
-                text += ` ${r.skipped.length}টি বাদ পড়েছে (ইমেইল নেই বা পাঠানো যায়নি)।`;
+                html += `<br><br><strong>${r.skipped.length}টি বাদ পড়েছে, কারণ:</strong>`;
+                html += '<ul style="margin:8px 0 0 18px;padding:0;">' +
+                    r.skipped.map(s => `<li style="margin-bottom:4px;">${s}</li>`).join('') +
+                    '</ul>';
             }
-            if(msgBox){ msgBox.style.background = '#e8f8ee'; msgBox.style.color = '#0b6623'; msgBox.innerText = text; }
+            if(msgBox){ msgBox.style.background = '#e8f8ee'; msgBox.style.color = '#0b6623'; msgBox.innerHTML = html; }
         } else {
-            if(msgBox){ msgBox.style.background = '#fff0f0'; msgBox.style.color = '#d62828'; msgBox.innerText = '❌ রিমাইন্ডার পাঠাতে সমস্যা হয়েছে।'; }
+            if(msgBox){ msgBox.style.background = '#fff0f0'; msgBox.style.color = '#d62828'; msgBox.innerText = '❌ রিমাইন্ডার পাঠাতে সমস্যা হয়েছে: ' + (json.error || ''); }
         }
     } catch(err){
         if(msgBox){ msgBox.style.background = '#fff0f0'; msgBox.style.color = '#d62828'; msgBox.innerText = '❌ সার্ভারের সাথে সংযোগ করা যায়নি।'; }
