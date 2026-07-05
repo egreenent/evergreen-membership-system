@@ -673,6 +673,7 @@ border-radius:8px;
 <a href="#" onclick="showSection('expensesSection', this); loadExpensesSection();">💸 Expenses</a>
 <a href="#" onclick="showSection('noticesSection', this)">📢 Notices</a>
 <a href="#" onclick="showSection('gallerySection', this); loadGalleryAdmin();">🖼️ Gallery</a>
+<a href="#" onclick="showSection('loginLogsSection', this); loadLoginLogs();">🕒 Login History</a>
 <a href="#" onclick="showSection('downloadsSection', this)">📥 Downloads</a>
 <a href="#" onclick="showSection('analyticsSection', this); loadAnalytics();">📊 Analytics</a>
 <a href="#" onclick="showSection('settingsSection', this)">⚙ Settings</a>
@@ -1088,6 +1089,53 @@ Save Member
   <p style="color:#666;font-size:14px;margin-bottom:20px">মেম্বারদের আপলোড করা সব ছবি এখানে দেখা যাবে। অবাঞ্ছিত ছবি ডিলিট করতে পারবেন।</p>
   <div id="galleryAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">
     <p style="color:#888;grid-column:1/-1;text-align:center;padding:20px">লোড হচ্ছে...</p>
+  </div>
+</div>
+</div>
+
+<!-- LOGIN HISTORY -->
+
+<div class="page-section" id="loginLogsSection">
+<div class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+    <h2 style="margin-bottom:0">🕒 Member Login History</h2>
+    <button onclick="loadLoginLogs()" style="background:#0b6b2d;color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 Refresh</button>
+  </div>
+
+  <input type="text" id="loginLogSearch" placeholder="🔍 Member ID বা নাম দিয়ে খুঁজুন..." oninput="renderLoginSummary()"
+      style="width:100%;max-width:340px;padding:11px 16px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:20px;">
+
+  <h3 style="color:#0b6623;font-size:16px;margin-bottom:10px;">সদস্য অনুযায়ী সারসংক্ষেপ</h3>
+  <div class="table-container" style="margin-bottom:30px;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Member ID</th>
+          <th>Name</th>
+          <th>মোট লগইন</th>
+          <th>সর্বশেষ লগইন</th>
+        </tr>
+      </thead>
+      <tbody id="loginSummaryTable">
+        <tr><td colspan="4" style="text-align:center;color:#888;padding:20px">লোড হচ্ছে...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="color:#0b6623;font-size:16px;margin-bottom:10px;">সম্পূর্ণ লগ (সাম্প্রতিক ২০০টি)</h3>
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>সময়</th>
+          <th>Member ID</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody id="loginRawTable">
+        <tr><td colspan="3" style="text-align:center;color:#888;padding:20px">লোড হচ্ছে...</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 </div>
@@ -1714,6 +1762,83 @@ async function deleteGalleryPhoto(fileId){
         }
     } catch(err){
         alert('সার্ভার সমস্যা, ডিলিট করা যায়নি।');
+    }
+}
+
+/* =========================================
+   MEMBER LOGIN HISTORY — Admin
+   ========================================= */
+let allLoginLogs = [];
+
+async function loadLoginLogs(){
+    const summaryBody = document.getElementById('loginSummaryTable');
+    const rawBody = document.getElementById('loginRawTable');
+    if(summaryBody) summaryBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;padding:20px">লোড হচ্ছে...</td></tr>';
+    if(rawBody) rawBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;padding:20px">লোড হচ্ছে...</td></tr>';
+
+    try {
+        const res = await fetch(API_URL + '?action=getLoginLogs');
+        const json = await res.json();
+        allLoginLogs = json.logs || [];
+        renderLoginSummary();
+    } catch(err){
+        if(summaryBody) summaryBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#d62828;padding:20px">লোড করা যায়নি।</td></tr>';
+        if(rawBody) rawBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#d62828;padding:20px">লোড করা যায়নি।</td></tr>';
+    }
+}
+
+function renderLoginSummary(){
+    const search = (document.getElementById('loginLogSearch')?.value || '').trim().toLowerCase();
+
+    const filtered = allLoginLogs.filter(l =>
+        !search ||
+        String(l.memberId).toLowerCase().includes(search) ||
+        String(l.memberName).toLowerCase().includes(search)
+    );
+
+    // ── সদস্য অনুযায়ী সারসংক্ষেপ (Count + সর্বশেষ লগইন) ──
+    const summaryMap = {};
+    filtered.forEach(l => {
+        const key = l.memberId || '(unknown)';
+        if(!summaryMap[key]){
+            summaryMap[key] = { memberId: l.memberId, memberName: l.memberName, count: 0, last: l.timestamp };
+        }
+        summaryMap[key].count++;
+        // allLoginLogs আগে থেকেই newest-first, তাই প্রথমটাই সর্বশেষ লগইন
+    });
+    const summaryList = Object.values(summaryMap).sort((a, b) => b.count - a.count);
+
+    const summaryBody = document.getElementById('loginSummaryTable');
+    if(summaryBody){
+        if(summaryList.length === 0){
+            summaryBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;padding:20px">কোনো লগইন রেকর্ড নেই।</td></tr>';
+        } else {
+            summaryBody.innerHTML = summaryList.map(s => `
+                <tr>
+                    <td><strong>${s.memberId}</strong></td>
+                    <td>${s.memberName || '-'}</td>
+                    <td>${s.count}</td>
+                    <td>${s.last}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    // ── সম্পূর্ণ লগ (সাম্প্রতিক ২০০টি) ──
+    const rawBody = document.getElementById('loginRawTable');
+    if(rawBody){
+        const raw = filtered.slice(0, 200);
+        if(raw.length === 0){
+            rawBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;padding:20px">কোনো লগইন রেকর্ড নেই।</td></tr>';
+        } else {
+            rawBody.innerHTML = raw.map(l => `
+                <tr>
+                    <td>${l.timestamp}</td>
+                    <td><strong>${l.memberId}</strong></td>
+                    <td>${l.memberName || '-'}</td>
+                </tr>
+            `).join('');
+        }
     }
 }
 
