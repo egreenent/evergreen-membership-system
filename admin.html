@@ -786,7 +786,7 @@ border-radius:8px;
 
 
 <div class="section">
-<h2>Recent Payments</h2>
+<h2>Recent Payments <span style="font-size:13px;font-weight:400;color:#888;">(সাম্প্রতিক ১০টি)</span></h2>
 
 <div id="recentPayments"></div>
 
@@ -803,6 +803,13 @@ border-radius:8px;
 </thead>
 <tbody id="paymentTable"></tbody>
 </table>
+</div>
+
+<div style="text-align:center;margin-top:14px;">
+    <a href="#" onclick="showSection('paymentsSection'); fetchLivePaymentData(); return false;"
+        style="display:inline-block;color:#0b6623;font-weight:700;font-size:14px;text-decoration:none;border:1px solid #0b6623;padding:9px 20px;border-radius:20px;">
+        📋 সব পেমেন্ট দেখুন (মাস/বছর ফিল্টার সহ) →
+    </a>
 </div>
 
 </div>
@@ -1852,12 +1859,12 @@ async function loadPayments() {
         let tableHtml = '';
         let recentHtml = '';
 
-        payments.forEach((p, index) => {
+        payments.slice(0, 10).forEach((p, index) => {
             const statusStyle = String(p.status).toLowerCase() === 'paid' 
                 ? 'background:#d1e7dd; color:#0f5132;' 
                 : 'background:#f8d7da; color:#842029;';
 
-            // ড্যাশবোর্ড ও পেমেন্ট সেকশনের মেইন টেবিল
+            // ড্যাশবোর্ড ও পেমেন্ট সেকশনের মেইন টেবিল (সর্বোচ্চ ১০টি — বাকিগুলো Payments ট্যাবে ফিল্টার দিয়ে দেখা যাবে)
             tableHtml += `
                 <tr>
                     <td><strong>${p.receipt || 'N/A'}</strong></td>
