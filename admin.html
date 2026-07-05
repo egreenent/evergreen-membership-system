@@ -2349,8 +2349,8 @@ function dlOpenPdf() {
 /* ══════════════════════════════════════════════════════
    DUE REMINDER — Copy to Clipboard
 ══════════════════════════════════════════════════════ */
-function copyReminder(name, phone, month, fee) {
-    const text = `প্রিয় ${name} ভাই/আপু,
+function buildReminderText(name, month, fee) {
+    return `প্রিয় ${name} ভাই/আপু,
 
 আশা করি ভালো আছেন। আপনার ${month} মাসের EverGreen Enterprise সদস্যপদ চাঁদা ৳${fee} এখনো পরিশোধ হয়নি।
 
@@ -2358,6 +2358,10 @@ function copyReminder(name, phone, month, fee) {
 
 ধন্যবাদ
 EverGreen Enterprise`;
+}
+
+function copyReminder(name, phone, month, fee) {
+    const text = buildReminderText(name, month, fee);
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => alert('✅ Reminder কপি হয়েছে! WhatsApp বা SMS-এ পেস্ট করুন।'));
     } else {
@@ -2369,6 +2373,26 @@ EverGreen Enterprise`;
         document.body.removeChild(ta);
         alert('✅ Reminder কপি হয়েছে!');
     }
+}
+
+// WhatsApp Click-to-Send — মেসেজ আগে থেকে লেখা অবস্থায় WhatsApp খুলে যাবে, শুধু Send চাপতে হবে
+function openWhatsAppReminder(name, phone, month, fee) {
+    const text = buildReminderText(name, month, fee);
+
+    let digits = String(phone || '').replace(/[^0-9]/g, '');
+    if (digits.startsWith('0')) {
+        digits = '880' + digits.substring(1);      // ০১xxxxxxxxx → ৮৮০1xxxxxxxxx
+    } else if (!digits.startsWith('880')) {
+        digits = '880' + digits;
+    }
+
+    if (!digits || digits.length < 12) {
+        alert('⚠️ এই মেম্বারের সঠিক মোবাইল নম্বর পাওয়া যায়নি, তাই WhatsApp লিংক বানানো যায়নি।');
+        return;
+    }
+
+    const url = `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
 }
 
 function logout() {
@@ -2773,6 +2797,10 @@ async function loadDueMembers() {
                 <button onclick="copyReminder('${m.name}','${m.phone}','${selMonth}','${m.monthlyFee || 1000}')"
                     style="background:#e65100;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:4px">
                     📋 Reminder
+                </button>
+                <button onclick="openWhatsAppReminder('${m.name}','${m.phone}','${selMonth}','${m.monthlyFee || 1000}')"
+                    style="background:#25D366;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:4px">
+                    📱 WhatsApp
                 </button>
             </td>
         </tr>`;
