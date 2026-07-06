@@ -192,6 +192,26 @@ background:#0b6b2d;
 color:#fff;
 }
 
+/* ═══════════════════════════════════════════════════
+   গ্লোবাল ক্লিক/ট্যাপ ফিডব্যাক — বোঝা যাবে ক্লিক হয়েছে কিনা
+   (মোবাইলে hover কাজ করে না বলেই এই :active স্টেট জরুরি)
+   ═══════════════════════════════════════════════════ */
+button,
+.action-btn,
+.tab-btn,
+[onclick]{
+transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+-webkit-tap-highlight-color: rgba(11,107,45,0.25);
+}
+
+button:active,
+.action-btn:active,
+.tab-btn:active,
+[onclick]:active{
+transform: scale(0.95) !important;
+filter: brightness(0.88);
+}
+
 /* SEARCH */
 
 .search-box{
