@@ -499,13 +499,14 @@ font-size:32px;
 
 <div class="dashboard-header">
 <div class="dashboard-title">
-<h1>Member Dashboard</h1>
-<p>EverGreen Enterprise Membership Portal</p>
+<h1 data-i18n="dashTitle">Member Dashboard</h1>
+<p data-i18n="dashSubtitle">EverGreen Enterprise Membership Portal</p>
 </div>
 <div class="header-right">
 <div class="member-id-box" id="memberIdText">Member ID</div>
-<button class="change-pass-btn" onclick="document.getElementById('passwordModal').style.display='flex'">🔑 পাসওয়ার্ড পরিবর্তন</button>
-<button class="logout-btn" onclick="logout()">Logout</button>
+<button class="change-pass-btn" onclick="toggleLanguage()" id="langToggleBtn" style="background:#0b5d2a;">🌐 বাংলা</button>
+<button class="change-pass-btn" onclick="document.getElementById('passwordModal').style.display='flex'" data-i18n="changePassBtn">🔑 পাসওয়ার্ড পরিবর্তন</button>
+<button class="logout-btn" onclick="logout()" data-i18n="logoutBtn">Logout</button>
 </div>
 </div>
 
@@ -518,28 +519,28 @@ font-size:32px;
 <p id="memberPhone"></p>
 <p id="memberEmail"></p>
 <p id="memberAddress"></p>
-<div class="member-status" id="memberStatus">Active Member</div>
+<div class="member-status" id="memberStatus" data-i18n="activeMemberStatus">Active Member</div>
 <div>
-   <a href="#" id="viewProfileBtn" class="viewProfileBtn">📋 View Profile</a>
+   <a href="#" id="viewProfileBtn" class="viewProfileBtn" data-i18n="viewProfileLink">📋 View Profile</a>
 </div>
 </div>
 </div>
 
 <div class="stats-grid">
 <div class="stat-box">
-<h3>Total Payment</h3>
+<h3 data-i18n="statTotalPayment">Total Payment</h3>
 <h2 id="totalPayment">৳ 0</h2>
 </div>
 <div class="stat-box">
-<h3>Total Receipts</h3>
+<h3 data-i18n="statTotalReceipts">Total Receipts</h3>
 <h2 id="totalReceipts">0</h2>
 </div>
 <div class="stat-box">
-<h3>Due Amount</h3>
+<h3 data-i18n="statDueAmount">Due Amount</h3>
 <h2 id="dueAmount">৳ 0</h2>
 </div>
 <div class="stat-box">
-<h3>Membership Status</h3>
+<h3 data-i18n="statMembershipStatus">Membership Status</h3>
 <h2 id="membershipStatus">Active</h2>
 </div>
 </div>
@@ -547,51 +548,51 @@ font-size:32px;
 <!-- ═══════ TAB NAVIGATION ═══════ -->
 <div class="tab-nav">
 <button class="tab-btn active" data-tab="tab-notice" onclick="switchMemberTab('tab-notice', this)">
-<span class="tab-icon">📢</span><span>Notice</span><span id="noticeBadge" style="display:none;background:#d62828;color:#fff;border-radius:50%;font-size:10px;font-weight:700;width:16px;height:16px;line-height:16px;text-align:center;margin-left:4px">1</span>
+<span class="tab-icon">📢</span><span data-i18n="tabNotice">Notice</span><span id="noticeBadge" style="display:none;background:#d62828;color:#fff;border-radius:50%;font-size:10px;font-weight:700;width:16px;height:16px;line-height:16px;text-align:center;margin-left:4px">1</span>
 </button>
 <button class="tab-btn" data-tab="tab-downloads" onclick="switchMemberTab('tab-downloads', this)">
-<span class="tab-icon">📥</span><span>Downloads</span>
+<span class="tab-icon">📥</span><span data-i18n="tabDownloads">Downloads</span>
 </button>
 <button class="tab-btn" data-tab="tab-payments" onclick="switchMemberTab('tab-payments', this)">
-<span class="tab-icon">💳</span><span>Payment History</span>
+<span class="tab-icon">💳</span><span data-i18n="tabPayments">Payment History</span>
 </button>
 <button class="tab-btn" data-tab="tab-oldrecords" onclick="switchMemberTab('tab-oldrecords', this)">
-<span class="tab-icon">📂</span><span>Old Records</span>
+<span class="tab-icon">📂</span><span data-i18n="tabOldRecords">Old Records</span>
 </button>
 <button class="tab-btn" data-tab="tab-onlinepay" onclick="switchMemberTab('tab-onlinepay', this)">
-<span class="tab-icon">💰</span><span>Online Payment</span>
+<span class="tab-icon">💰</span><span data-i18n="tabOnlinePay">Online Payment</span>
 </button>
 </div>
 
 <div class="tab-panel active" id="tab-notice">
 <div class="section">
-<h2>Notice Board</h2>
+<h2 data-i18n="noticeBoardTitle">Notice Board</h2>
 <div class="notice-item" id="noticeBox">No Notice Available</div>
 </div>
 </div>
 
 <div class="tab-panel" id="tab-downloads">
 <div class="section">
-<h2>Downloads</h2>
+<h2 data-i18n="downloadsTitle">Downloads</h2>
 <div class="download-box">
-<a id="membershipPdf" href="#" target="_blank" class="download-btn">📄 Membership PDF</a>
-<a id="idCard" href="#" target="_blank" class="download-btn">🪪 ID Card</a>
+<a id="membershipPdf" href="#" target="_blank" class="download-btn">📄 <span data-i18n="dlMembershipPdf">Membership PDF</span></a>
+<a id="idCard" href="#" target="_blank" class="download-btn">🪪 <span data-i18n="dlIdCard">ID Card</span></a>
 </div>
 </div>
 </div>
 
 <div class="tab-panel" id="tab-payments">
 <div class="section">
-<h2>Payment History</h2>
+<h2 data-i18n="paymentHistoryTitle">Payment History</h2>
 <div class="table-wrapper">
 <table class="payment-table">
 <thead>
 <tr>
-<th>Month</th>
-<th>Status</th>
-<th>Amount</th>
-<th>Total</th>
-<th>Download</th>
+<th data-i18n="thMonth">Month</th>
+<th data-i18n="thStatus">Status</th>
+<th data-i18n="thAmount">Amount</th>
+<th data-i18n="thTotal">Total</th>
+<th data-i18n="thDownload">Download</th>
 </tr>
 </thead>
 <tbody id="paymentTableBody">
@@ -653,7 +654,7 @@ font-size:32px;
 
 <div class="tab-panel" id="tab-onlinepay">
 <div class="section">
-<h2>Online Payment</h2>
+<h2 data-i18n="onlinePayTitle">Online Payment</h2>
 <div class="payment-buttons">
 <button>bKash Payment</button>
 <button>Nagad Payment</button>
@@ -990,6 +991,167 @@ font-size:32px;
 const API_URL = "https://script.google.com/macros/s/AKfycbyva2SinAyCPj76zYzUQNc05PItsQ6nKVRoZvbS15qGyRWlsmaa6WrTOKTy6xaj50tS/exec";
 window.currentMemberData = null; 
 
+/* =========================================================
+   ভাষা টগল (English / বাংলা) — শুধু স্ট্যাটিক লেবেলগুলো বদলায়,
+   মেম্বারের নিজের তথ্য (নাম, নোটিশ ইত্যাদি) অপরিবর্তিত থাকে
+   ========================================================= */
+const translations = {
+    en: {
+        dashTitle: "Member Dashboard",
+        dashSubtitle: "EverGreen Enterprise Membership Portal",
+        changePassBtn: "🔑 Change Password",
+        logoutBtn: "Logout",
+        statTotalPayment: "Total Payment",
+        statTotalReceipts: "Total Receipts",
+        statDueAmount: "Due Amount",
+        statMembershipStatus: "Membership Status",
+        tabNotice: "Notice",
+        tabDownloads: "Downloads",
+        tabPayments: "Payment History",
+        tabOldRecords: "Old Records",
+        tabOnlinePay: "Online Payment",
+        noticeBoardTitle: "Notice Board",
+        downloadsTitle: "Downloads",
+        dlMembershipPdf: "Membership PDF",
+        dlIdCard: "ID Card",
+        paymentHistoryTitle: "Payment History",
+        thMonth: "Month",
+        thStatus: "Status",
+        thAmount: "Amount",
+        thTotal: "Total",
+        thDownload: "Download",
+        onlinePayTitle: "Online Payment",
+        activeMemberStatus: "Active Member",
+        viewProfileLink: "📋 View Profile"
+    },
+    bn: {
+        dashTitle: "মেম্বার ড্যাশবোর্ড",
+        dashSubtitle: "এভারগ্রিন এন্টারপ্রাইজ মেম্বারশিপ পোর্টাল",
+        changePassBtn: "🔑 পাসওয়ার্ড পরিবর্তন",
+        logoutBtn: "লগআউট",
+        statTotalPayment: "মোট পেমেন্ট",
+        statTotalReceipts: "মোট রশিদ",
+        statDueAmount: "বকেয়া পরিমাণ",
+        statMembershipStatus: "সদস্যপদ অবস্থা",
+        tabNotice: "নোটিশ",
+        tabDownloads: "ডাউনলোড",
+        tabPayments: "পেমেন্ট হিস্ট্রি",
+        tabOldRecords: "পুরোনো হিসাব",
+        tabOnlinePay: "অনলাইন পেমেন্ট",
+        noticeBoardTitle: "নোটিশ বোর্ড",
+        downloadsTitle: "ডাউনলোড",
+        dlMembershipPdf: "মেম্বারশিপ পিডিএফ",
+        dlIdCard: "আইডি কার্ড",
+        paymentHistoryTitle: "পেমেন্ট হিস্ট্রি",
+        thMonth: "মাস",
+        thStatus: "অবস্থা",
+        thAmount: "পরিমাণ",
+        thTotal: "মোট",
+        thDownload: "ডাউনলোড",
+        onlinePayTitle: "অনলাইন পেমেন্ট",
+        activeMemberStatus: "সক্রিয় সদস্য",
+        viewProfileLink: "📋 প্রোফাইল দেখুন"
+    }
+};
+
+function applyLanguage(lang) {
+    const dict = translations[lang] || translations.en;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    const btn = document.getElementById('langToggleBtn');
+    if (btn) btn.textContent = (lang === 'en') ? '🌐 বাংলা' : '🌐 English';
+    localStorage.setItem('egDashboardLang', lang);
+}
+
+function toggleLanguage() {
+    const current = localStorage.getItem('egDashboardLang') || 'en';
+    applyLanguage(current === 'en' ? 'bn' : 'en');
+}
+
+/* =========================================================
+   থিম (কালার) পিকার — মেম্বার নিজের পছন্দমতো রঙ বেছে নিতে পারবে
+   =========================================================
+   এটা শুধু এই ব্রাউজারে সেভ থাকে (localStorage) — অন্য ডিভাইসে
+   লগইন করলে আবার বেছে নিতে হবে।
+   ========================================================= */
+const dashboardThemes = {
+    green:  { name: "🟢 Classic Green", primary: "#0b6623", dark: "#084d1a" },
+    blue:   { name: "🔵 Ocean Blue",    primary: "#0b5cad", dark: "#083f78" },
+    purple: { name: "🟣 Royal Purple",  primary: "#6a1b9a", dark: "#4a1270" },
+    rose:   { name: "🌹 Rose",          primary: "#b3264a", dark: "#821b35" },
+    orange: { name: "🟠 Sunset Orange", primary: "#d9622b", dark: "#a3491f" },
+    dark:   { name: "⚫ Midnight",      primary: "#2c2c34", dark: "#1a1a20" }
+};
+
+function applyDashboardTheme(themeKey) {
+    const theme = dashboardThemes[themeKey] || dashboardThemes.green;
+    let styleTag = document.getElementById('dynamicThemeStyle');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamicThemeStyle';
+        document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = `
+        .dashboard-header{ background:${theme.primary} !important; }
+        .tab-btn.active{ background:${theme.primary} !important; border-color:${theme.primary} !important; }
+        .change-pass-btn{ background:${theme.dark} !important; }
+        .logout-btn{ background:${theme.dark} !important; }
+        .download-btn{ background:${theme.primary} !important; }
+        .viewProfileBtn{ color:${theme.primary} !important; }
+        .member-status{ background:${theme.primary} !important; }
+        .stat-box h2{ color:${theme.primary} !important; }
+        #themePickerBtn{ background:${theme.primary} !important; }
+    `;
+    localStorage.setItem('egDashboardTheme', themeKey);
+    document.querySelectorAll('#themeSwatches .theme-swatch').forEach(sw => {
+        sw.style.outline = (sw.dataset.theme === themeKey) ? '3px solid #333' : 'none';
+    });
+}
+
+function toggleThemePicker() {
+    const panel = document.getElementById('themePickerPanel');
+    if (panel) panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
+}
+
+function buildThemePicker() {
+    const btn = document.createElement('div');
+    btn.id = 'themePickerBtn';
+    btn.title = 'Change Theme';
+    btn.innerHTML = '🎨';
+    btn.style.cssText = 'position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:#0b6623;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,0.25);z-index:9998;';
+    btn.onclick = toggleThemePicker;
+
+    const panel = document.createElement('div');
+    panel.id = 'themePickerPanel';
+    panel.style.cssText = 'position:fixed;bottom:86px;right:24px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.2);display:none;flex-direction:column;gap:10px;z-index:9998;min-width:190px;';
+
+    const title = document.createElement('div');
+    title.textContent = '🎨 Choose Theme';
+    title.style.cssText = 'font-weight:700;font-size:14px;color:#333;margin-bottom:4px;';
+    panel.appendChild(title);
+
+    const swatchWrap = document.createElement('div');
+    swatchWrap.id = 'themeSwatches';
+    swatchWrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+
+    Object.keys(dashboardThemes).forEach(key => {
+        const t = dashboardThemes[key];
+        const row = document.createElement('div');
+        row.className = 'theme-swatch';
+        row.dataset.theme = key;
+        row.style.cssText = `display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;background:#f5f5f5;`;
+        row.innerHTML = `<span style="width:20px;height:20px;border-radius:50%;background:${t.primary};display:inline-block;"></span><span style="font-size:13px;color:#333;">${t.name}</span>`;
+        row.onclick = () => applyDashboardTheme(key);
+        swatchWrap.appendChild(row);
+    });
+
+    panel.appendChild(swatchWrap);
+    document.body.appendChild(btn);
+    document.body.appendChild(panel);
+}
+
 window.onload = function() {
     const loggedInId = localStorage.getItem('memberId');
     if (!loggedInId) {
@@ -1001,6 +1163,10 @@ window.onload = function() {
     fetchOldRecords(loggedInId);
     fetchMyExpenseShare(loggedInId);
     setupProfilePopupEvents();
+
+    applyLanguage(localStorage.getItem('egDashboardLang') || 'en');
+    buildThemePicker();
+    applyDashboardTheme(localStorage.getItem('egDashboardTheme') || 'green');
 };
 
 // ── TAB SWITCHING ──
@@ -1598,39 +1764,6 @@ function toggleProfileEdit() {
     }
 }
 
-// ── নতুন ছবি বেছে নেওয়া হলে সেটা সার্ভারে আপলোড করা (Drive-এ সেভ হয়ে আসল URL ফেরত দেয়) ──
-function fileToBase64ForProfile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-async function uploadNewProfilePhotoIfSelected(memberId) {
-    const fileInput = document.getElementById('peditPhotoFile');
-    const file = fileInput && fileInput.files && fileInput.files[0];
-    if (!file) return null; // নতুন কোনো ছবি সিলেক্ট করা হয়নি, পুরোনোটাই থাকবে
-
-    const base64 = await fileToBase64ForProfile(file);
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-            action: 'uploadProfilePhoto',
-            memberId: memberId,
-            file: { name: file.name, type: file.type, data: base64 }
-        })
-    });
-    const json = await res.json();
-    if (!json.success) {
-        throw new Error(json.error || 'ছবি আপলোড ব্যর্থ হয়েছে।');
-    }
-    fileInput.value = '';
-    return json.photoUrl;
-}
-
 // ── প্রোফাইল সেভ করা (editMember → Google Sheet) ──
 async function saveMemberProfileEdit() {
     const msgEl = document.getElementById('peditSaveMsg');
@@ -1640,20 +1773,6 @@ async function saveMemberProfileEdit() {
         msgEl.textContent = '❌ Member ID পাওয়া যাচ্ছে না।';
         msgEl.style.color = '#c0392b';
         return;
-    }
-
-    // ধাপ ১: নতুন ছবি সিলেক্ট করা থাকলে আগে সেটা আপলোড করা হবে
-    let newPhotoUrl = null;
-    if (document.getElementById('peditPhotoFile')?.files?.[0]) {
-        msgEl.textContent = '⏳ ছবি আপলোড হচ্ছে...';
-        msgEl.style.color = '#0b5d2a';
-        try {
-            newPhotoUrl = await uploadNewProfilePhotoIfSelected(memberId);
-        } catch (err) {
-            msgEl.textContent = '❌ ছবি আপলোড ব্যর্থ: ' + err.message;
-            msgEl.style.color = '#c0392b';
-            return; // ছবি আপলোড ব্যর্থ হলে বাকি তথ্যও সেভ করা হবে না
-        }
     }
 
     const updatedData = {
@@ -1671,15 +1790,20 @@ async function saveMemberProfileEdit() {
         // পরিবর্তন না হওয়া ফিল্ড — currentMemberData থেকে রাখা
         monthlyFee:    window.currentMemberData?.monthlyFee  || '',
         password:      window.currentMemberData?.password    || '',
-        // নতুন ছবি আপলোড হয়ে থাকলে সেই আসল URL, নাহলে পুরোনোটাই
-        photo:         newPhotoUrl || window.currentMemberData?.photo || '',
+        photo:         (function() {
+            const fileInput = document.getElementById('peditPhotoFile');
+            const preview   = document.getElementById('peditPhotoPreview');
+            // যদি নতুন ছবি select করা হয় তাহলে preview src নেওয়া হবে (base64)
+            // Server upload ছাড়া base64 সরাসরি save করা হবে না — পুরোনো URL রাখা হবে
+            return window.currentMemberData?.photo || '';
+        })(),
         signatureUrl:  window.currentMemberData?.signatureUrl|| '',
         pdfUrl:        window.currentMemberData?.pdfUrl      || '',
         idCardUrl:     window.currentMemberData?.idCardUrl   || '',
         status:        window.currentMemberData?.status      || 'Active',
     };
 
-    msgEl.textContent = '⏳ তথ্য সেভ হচ্ছে...';
+    msgEl.textContent = '⏳ সেভ হচ্ছে...';
     msgEl.style.color = '#0b5d2a';
 
     try {
@@ -1702,7 +1826,6 @@ async function saveMemberProfileEdit() {
             nomineeName:  updatedData.nomineeName,
             nomineePhone: updatedData.nomineePhone,
             joinDate:     updatedData.joinDate,
-            photo:        updatedData.photo,
         });
 
         // View mode-এ দেখানো ফিল্ডগুলো আপডেট করো
@@ -1715,13 +1838,6 @@ async function saveMemberProfileEdit() {
         document.getElementById('popupNomineeName').innerText  = updatedData.nomineeName;
         document.getElementById('popupNomineePhone').innerText = updatedData.nomineePhone;
         document.getElementById('popupJoinDate').innerText     = updatedData.joinDate;
-
-        // নতুন ছবি থাকলে সব জায়গায় (হেডার, ভিউ, এডিট প্রিভিউ) সাথে সাথে আপডেট
-        if (newPhotoUrl) {
-            if (document.getElementById('memberPhoto'))       document.getElementById('memberPhoto').src = newPhotoUrl;
-            if (document.getElementById('popupPhoto'))        document.getElementById('popupPhoto').src = newPhotoUrl;
-            if (document.getElementById('peditPhotoPreview')) document.getElementById('peditPhotoPreview').src = newPhotoUrl;
-        }
 
         // Dashboard header-এও নাম আপডেট
         if (document.getElementById('memberName'))
