@@ -744,9 +744,9 @@ border-radius:8px;
 
 <div class="action-btn" onclick="openNoticeModal()">📢 Publish Notice</div>
 
-<div class="action-btn" onclick="generateIdCard()">🪪 Generate ID Card</div>
+<div class="action-btn" onclick="showSection('downloadsSection')">🪪 Generate ID Card</div>
 
-<div class="action-btn" onclick="generatePDF()">📄 Generate PDF</div>
+<div class="action-btn" onclick="showSection('downloadsSection')">📄 Generate PDF</div>
 
 </div>
 
@@ -2065,13 +2065,31 @@ function generateMemberId(){
     return 'ege' + String(members.length + 1).padStart(4, '0');
 }
 
-function findMemberName() {
+function closeModal(){
+    const m = document.getElementById('memberModal');
+    if (m) m.style.display = 'none';
+}
+
+async function findMemberName() {
     const input = document.getElementById('modalPaymentMemberId');
     const nameField = document.getElementById('modalPaymentMemberName');
     if (!input || !nameField) return;
 
     const memberId = input.value.trim().toLowerCase();
-    const member = members.find(m => String(m.memberId).trim().toLowerCase() === memberId);
+    if (!memberId) { nameField.value = ''; return; }
+
+    let member = members.find(m => String(m.memberId).trim().toLowerCase() === memberId);
+
+    // members ক্যাশ খালি থাকলে (পেজ লোড হওয়ার সাথে সাথে ব্যবহার করলে এমন হতে পারে)
+    // একবার সরাসরি সার্ভার থেকে তাজা তালিকা আনার চেষ্টা করা হচ্ছে
+    if (!member && (!members || members.length === 0)) {
+        try {
+            const res = await fetch(API_URL + '?action=members');
+            members = await res.json();
+            member = members.find(m => String(m.memberId).trim().toLowerCase() === memberId);
+        } catch (e) { /* নেটওয়ার্ক সমস্যা হলে চুপচাপ থাকবে, নিচে খালি দেখাবে */ }
+    }
+
     nameField.value = member ? member.name : '';
 }
 
@@ -2787,7 +2805,7 @@ function switchPayTab(tab) {
 // ══════════════════════════════════════
 // SEARCH MEMBER PAYMENT HISTORY
 // ══════════════════════════════════════
-function searchMemberPayments() {
+async function searchMemberPayments() {
     const input    = document.getElementById('searchMemberId').value.trim().toLowerCase();
     const tbody    = document.getElementById('searchMemberTableBody');
     const infoBox  = document.getElementById('searchMemberInfo');
@@ -2800,6 +2818,20 @@ function searchMemberPayments() {
 
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#0b6623">⏳ খোঁজা হচ্ছে...</td></tr>';
     infoBox.style.display = 'none';
+
+    // members/payments ক্যাশ খালি থাকলে সরাসরি সার্ভার থেকে তাজা করে আনার চেষ্টা
+    if (!members || members.length === 0) {
+        try {
+            const res = await fetch(API_URL + '?action=members');
+            members = await res.json();
+        } catch (e) { /* নেটওয়ার্ক সমস্যা */ }
+    }
+    if (!payments || payments.length === 0) {
+        try {
+            const res = await fetch(API_URL + '?action=payments');
+            payments = await res.json();
+        } catch (e) { /* নেটওয়ার্ক সমস্যা */ }
+    }
 
     if (!members || members.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;padding:20px">সদস্য তথ্য লোড হয়নি। পেজ রিফ্রেশ করুন।</td></tr>';
