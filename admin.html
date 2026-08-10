@@ -740,6 +740,11 @@ border-radius:8px;
 <h2 id="totalDue" style="color:#d62828">৳ 0</h2>
 </div>
 
+<div class="card" style="border-left:4px solid #8b0000">
+<h3>Total Due <span style="font-size:11px;color:#999;font-weight:400">(সর্বমোট)</span></h3>
+<h2 id="grandTotalDue" style="color:#8b0000">৳ 0</h2>
+</div>
+
 <div class="card">
 <h3>Active Members</h3>
 <h2 id="activeMembers">0</h2>
@@ -2096,6 +2101,7 @@ async function updateDashboard() {
         if(document.getElementById('totalPayments')) document.getElementById('totalPayments').innerText = d.totalPayments;
         if(document.getElementById('totalCollection')) document.getElementById('totalCollection').innerText = "৳ " + d.totalCollection.toLocaleString();
         if(document.getElementById('totalDue')) document.getElementById('totalDue').innerText = "৳ " + (d.totalDue || 0).toLocaleString();
+        if(document.getElementById('grandTotalDue')) document.getElementById('grandTotalDue').innerText = "৳ " + (d.grandTotalDue || 0).toLocaleString();
     } catch(error) {
         console.error("Error updating dashboard:", error);
     }
