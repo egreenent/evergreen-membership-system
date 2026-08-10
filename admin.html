@@ -1232,6 +1232,10 @@ Save Member
       <h3>Active / Inactive</h3>
       <h2 id="anaActiveRatio">লোড হচ্ছে...</h2>
     </div>
+    <div class="analytics-box" style="border-left:4px solid #8b0000">
+      <h3>সর্বমোট বকেয়া</h3>
+      <h2 id="anaGrandTotalDue" style="color:#8b0000">লোড হচ্ছে...</h2>
+    </div>
   </div>
 
   <!-- প্রতি সদস্যের পেমেন্ট সারসংক্ষেপ -->
@@ -2355,6 +2359,7 @@ async function loadAnalytics() {
 
         document.getElementById('anaDueCount').textContent   = dueCount + ' জন';
         document.getElementById('anaActiveRatio').textContent = (d.activeMembers || 0) + ' / ' + ((d.totalMembers || 0) - (d.activeMembers || 0));
+        document.getElementById('anaGrandTotalDue').textContent = '৳ ' + (d.grandTotalDue || 0).toLocaleString();
     } catch(e) { console.error('Analytics summary error:', e); }
 
     // প্রতি সদস্যের table
